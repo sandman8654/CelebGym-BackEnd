@@ -1,11 +1,14 @@
 # CelebGym-BackEnd
 NodeJs, MongoDB, ExpressJS
 
-Server Installation
+To Install and start the server
+
 1. npm install
+
 2. node server.js
 
-Mongodb installation
+To Install Mongodb
+
 1. Open a terminal window and type the following command to download the latest release:
 curl http://downloads.mongodb.org/osx/mongodb-osx-x86_64-2.2.0.tgz > ~/Downloads/mongo.tgz
 
