@@ -57,6 +57,35 @@ exports.increaseUsagePromocode = function(req, res){
         });
     });
 }
+exports.changePassword = function(req,res){
+    var user = req.body;
+    console.log('Updating user: ' + user.email);
+    console.log(JSON.stringify(user));
+    var data={'msg':'error'};
+ //   console.log(new oID(id));
+    db.collection(userTableName, function(err, collection) {
+        var email = user.email, pwd=user.password;
+        collection.update({'email': email}, {$set:{'password':pwd}}, function(err, result) {
+            
+            if (err ) {
+                data={'msg':'Error updating user: ' + err};
+                console.log('Error updating user: ' + err);
+                //res.send({'error':'An error has occurred'});
+            } else {
+                console.log('' + result + ' document(s) updated');
+                //res.send(user);
+                data.msg='success';
+            }
+     //       res.send(data);
+            if (data.msg=='success'){
+                getUserInfo(res,collection,email,pwd);
+            }else{
+               res.send(data); 
+            }
+        });
+        
+    });
+}
 exports.findAll = function(req, res) {
     db.collection(userTableName, function(err, collection) {
    //      console.log(collection);
@@ -75,13 +104,53 @@ var getPromocodes = function(req, res) {
     });
     return null;
 };
+var getUserInfo = function(res,collection, email,pwd){
+    var resItem ={};
+    collection.findOne({'email':email}, function(err, item) {
+        console.log(email);
+        var data={'msg':'error','item':''};
+        if (err ){
+            data.msg="Error confirming user: " + err;
+            console.log('Error confirming user: ' + err);
+        }else{
+            if(item==null){
+                data.msg="No existing user. please sign up now.";
+            }else{
+           //     console.log(item);
+                var spwd = item['password'];
+                if (pwd == spwd){ 
+                    data.msg = "success"; 
+                    resItem = item;
+                }
+                else
+                  data.msg="Your password incorrect. please try agin";  
+            }
+             
+        }
+        if (data.msg =="success"){
+            // collect promocode data items.
+            db.collection(promocodeTableName, function(err, collection) {
+                collection.find().toArray(function(err, items) {
+                    resItem['promocodes'] = items;
+                    data.item = JSON.stringify(resItem);
+                    res.send(data);
+                });
+            });  
+        }else{
+            
+            res.send(data);
+        }
+       
+    });
+}
 exports.confirmUser = function(req,res){
     var user = req.body;
     console.log('Checking user: ' + JSON.stringify(user));
     var email = user.email, pwd= user.password;
     var resItem ={};
     db.collection(userTableName, function(err, collection) {
-
+ //       getUserInfo(res,collection,email,pwd);
+        console.log(email + pwd);
          collection.findOne({'email':email}, function(err, item) {
             var data={'msg':'error','item':''};
             if (err ){
@@ -101,7 +170,7 @@ exports.confirmUser = function(req,res){
                       data.msg="Your password incorrect. please try agin";  
                 }
                  
-            }
+            };
             if (data.msg =="success"){
                 // collect promocode data items.
                 db.collection(promocodeTableName, function(err, collection) {

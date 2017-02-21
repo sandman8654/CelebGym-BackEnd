@@ -15,6 +15,7 @@ app.use(function(req,res,next){
 })
 app.get('/users',user.findAll);
 app.post('/users',user.addUser);
+app.post('/forgot',user.changePassword);
 app.post('/confirmuser',user.confirmUser);
 app.get('/incpcode/:id', user.increaseUsagePromocode);
 app.put('/users/:id',user.updateUser);
