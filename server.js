@@ -19,6 +19,7 @@ app.post('/forgot',user.changePassword);
 app.post('/confirmuser',user.confirmUser);
 app.get('/incpcode/:id', user.increaseUsagePromocode);
 app.put('/users/:id',user.updateUser);
+app.put('/paystatus/:id',user.regUserPaymentStatus);
 app.delete('/users/:id',user.deleteUser);
 app.listen(3000);
 console.log('Listening on port 3000...');
