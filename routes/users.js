@@ -123,12 +123,12 @@ var getPromocodes = function(req, res) {
 };
 var checkPaymentStatus = function(item){
     var nowDate = new Date(),
-        dateStr = item.isPayDate||"01/01/1900",
+        dateStr = item.isPayDate||"01/01/3000",
         regDate = new Date(dateStr);
-    var diffDays = nowDate.getDate() - regDate.getDate()    ;
-    console.log(diffDays);
-    console.log(dateStr);
-    item.isPremiumUser = (diffDays>30)?false:true;   
+    var timeDiff = nowDate.getTime() - regDate.getTime();
+    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
+ 
+    item.isPremiumUser = (diffDays>30|| diffDays<0)?false:true;   
     return item;
 }
 var getUserInfo = function(res,collection, email,pwd){
@@ -173,7 +173,7 @@ var getUserInfo = function(res,collection, email,pwd){
 };
 exports.confirmUser = function(req,res){
     var user = req.body;
-    console.log('Checking user: ' + JSON.stringify(user));
+ //   console.log('Checking user: ' + JSON.stringify(user));
     var email = user.email, pwd= user.password;
     var resItem ={};
     db.collection(userTableName, function(err, collection) {
@@ -183,18 +183,18 @@ exports.confirmUser = function(req,res){
 };
 exports.addUser = function(req, res) {
     var user = req.body;
- 
+    var email = user.email, pwd= user.password;
     db.collection(userTableName, function(err, collection) {
         collection.insert(user, {safe:true}, function(err, result) {
             var data={'msg':'error'};
             if (err) {
                data={'msg':'Error adding user: ' + err};
- 
+               res.send(data);
             } else {
-  
-                data={'msg':'success'};
+                getUserInfo(res,collection,email,pwd);
+          //      data={'msg':'success'};
             }
-            res.send(data);
+            
         });
     });
 };
